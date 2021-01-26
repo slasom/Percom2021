@@ -1,0 +1,92 @@
+############## PROJECT CONFIGURATION ##############
+
+#Project Name.
+project_name: "Perses Test"
+
+#Author: Name of the operator. Used as a prefix to avoid name collision on.
+author: "spilab"
+
+######### EC2 Configuration #########
+
+#Instance AWS type: Only compatible with machines that support kvm virtualization -> https://help.ubuntu.com/community/KVM/Installation.
+instance_type: "c5.metal"
+
+#AWS Region.
+region: "eu-west-1"
+
+######### Environment Configuration #########
+  #### Set of devices ####
+
+  # Id: Name of set of devices
+  # Type: mobile
+  # Devices: numbers of Android devices to deploy
+  # #Android version: You can select 6 to 11.
+  # CPU:  maximum amount of available CPU resources each device can use
+    #(We recommend a minimum of 1.5)
+  # RAM:  maximum amount of memory each device can use
+    #(We recommend a minimum of 3g '3GB').
+
+devices:
+  - id: "Basic Devices"
+    type: "mobile"
+    devices: 5
+    android_version: 9
+    hardware:
+      cpu: "2"
+      ram: "3g"
+  - id: "Medium Devices"
+    type: "mobile"
+    devices: 6
+    android_version: 9
+    hardware:
+      cpu: "2.5"
+      ram: "4g"
+  - id: "Medium Devices"
+    type: "mobile"
+    devices: 8
+    android_version: 10
+    hardware:
+      cpu: "4"
+      ram: "6g"
+
+
+#Application Id of Android App (can find it in the 'build.graddle' file of the application).
+application_id: "com.spilab.percom21"
+
+#Time to wait for the deployment of Android devices (1m '1 minute', 1h '1 hour')
+#For example, for deploy 50 devices, wait 20m '20 minutes'
+time_wait: "9m"
+
+
+######### Tests Definition #########
+
+log_tags:
+  - "HeatmapLog"
+
+tests:
+#  - id: "GUI Performance"
+#    type: "espresso"
+#    expect:
+#      time_execution:
+#        under: 200
+
+  - id: "Observed Performance1"
+    type: "apipecker"
+    config:
+      concurrentUsers: 3
+      iterations: 5
+      delay: 500
+      url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=3&timeout=2500"
+    expect:
+      mean:
+        under: 6000
+#  - id: "Observed Performance2"
+#    type: "apipecker"
+#    config:
+#      concurrentUsers: 3
+#      iterations: 5
+#      delay: 500
+#      url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=3&timeout=2500"
+#    expect:
+#      mean:
+#        under: 6000

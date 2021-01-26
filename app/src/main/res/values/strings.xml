@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Covid19 Percom 2021</string>
+    <string name="action_heat_map">Get Heat Map</string>
+    <string name="ok">OK</string>
+    <string name="text_location_permission">Do you want to provide location permissions?</string>
+    <string name="title_location_permission">Location permissions</string>
+    <string name="msg_subscribed">Subscribed in topic!</string>
+    <string name="msg_subscribe_failed">Fail to subscribe.</string>
+</resources>

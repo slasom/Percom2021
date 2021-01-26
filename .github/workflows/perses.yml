@@ -1,0 +1,169 @@
+name: Perses Test
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+  KEY_NAME: ${{ secrets.KEY_NAME }}
+  KEY_PEM: ${{ secrets.KEY_PEM }}  
+  
+jobs:
+
+  perses-test:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: Generate Perses Test Project Id
+          uses: actions/github-script@v3
+          id: generate-project-id
+          with:
+            script: return (new Date()).toISOString().replace(/(T|:|\.)/g,'-').slice(0,-1)
+            result-encoding: string
+          
+        - name: Check Perses Test Project Id
+          run: echo "Perses Test Project ID <${{steps.generate-project-id.outputs.result}}>"        
+        
+        # Build
+        - name: "Build Android project"
+          uses: vgaidarji/android-github-actions-build@v1.0.1
+          with:
+            args: "./gradlew assembleAndroidTest assembleDebug"
+#        - run: ls -l ./app/build/outputs/apk/debug/app-debug.apk
+#        - run: ls -l ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+
+        # Build Perses config
+        - name: Use Node.js 14.x
+          uses: actions/setup-node@v1
+          with:
+            node-version: 14.x
+
+        - name: "Config setup"
+          run: |       
+            npx degit perses-org/gha .perses_gha
+            cd .perses_gha/setup
+            npm install
+            npm start
+        - name: Check apk path configured
+          run: tail -1 .perses-full.yml
+        
+        - name: Check setup
+          run: |
+            cat .perses-credentials.yml
+            ls -l .perses-key.pem
+        
+        # Get Perser Runner
+        - name: Get Perses Runner
+          uses: actions/checkout@v2
+          with:
+            repository: perses-org/perses
+            path: .perses_runner
+
+        - name: "Install dependences"
+          run: |       
+            cd .perses_runner
+            npm install
+        
+        # Run Perses test
+        - name: Use Terraform 0.12.25
+          uses: hashicorp/setup-terraform@v1
+          with:
+            terraform_version: 0.12.25
+
+        - name: "Perses Setup"
+          run: |       
+            cd .perses_runner
+            node index -a setup -g ../.perses-full.yml -c ../.perses-credentials.yml -n ${{steps.generate-project-id.outputs.result}}
+        - name: "Check project folder"
+          run: |       
+            cd .perses_runner/projects/${{steps.generate-project-id.outputs.result}}
+            find
+        - name: "Perses Launch Infrastructure"
+          run: |       
+            cd .perses_runner
+            node index -a launch -n ${{steps.generate-project-id.outputs.result}}
+#        - name: "Perses Test"
+#          run: |
+#            cd .perses_runner
+#            node index -a tests -n ${{steps.generate-project-id.outputs.result}}
+#
+#        - name: "Perses gets logs from virtual devices"
+#          run: |
+#            cd .perses_runner
+#            node index -a getLogs -n ${{steps.generate-project-id.outputs.result}}
+#
+#        - name: "Perses Destroy Infrastructure"
+#          run: |
+#            cd .perses_runner
+#            node index -a destroy -n ${{steps.generate-project-id.outputs.result}}
+#        # Check logs
+#        - name: "Check logs"
+#          run: |
+#            ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
+#            ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/devices-logs
+#
+#        # Gather Test Result
+#        - name: "Gather Performance Test Results"
+#          run: |
+#            cp -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/ .perses_gha/check/
+#            cd .perses_gha/check
+#            bash gatherResults.sh
+#
+#        # Check Perses Result
+#        - name: "Check Test Results"
+#          run: |
+#            cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .perses_gha/check/
+#            cd .perses_gha/check
+#            npm install
+#            npm start
+
+#        # Save Perses Result
+#        - name: Pushes test file
+#          uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
+#          env:
+#            API_TOKEN_GITHUB: ${{ secrets.PERSES_PAT }}
+#          with:
+#            source_file: .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
+#            destination_repo: 'slasom/persesResults'
+#            destination_folder: ${{steps.generate-project-id.outputs.result}}
+#            user_email: 'slasoman@alumnos.unex.es'
+#            user_name: 'slasom'
+#            commit_message: 'A custom message for the commit'
+#
+#        # Save Perses Result
+#        - name: Pushes test file
+#          uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
+#          env:
+#            API_TOKEN_GITHUB: ${{ secrets.PERSES_PAT }}
+#          with:
+#            source_file: .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
+#            destination_repo: 'slasom/persesResults'
+#            destination_folder: ${{steps.generate-project-id.outputs.result}}
+#            user_email: 'slasoman@alumnos.unex.es'
+#            user_name: 'slasom'
+#            commit_message: 'A custom message for the commit'
+#
+
+#        # Setup yq parser for obtaing custom tests path
+#        - name: "Setup parser for custom tests"
+#          run: |
+#            sudo apt-get install python3-setuptools
+#            sudo pip3 install yq
+#        # Setup Custom Test
+#        - name: "Setup Custom Test"
+#          run: |
+#            cp  .perses-full.yml .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/perses-config.yml
+#
+#            ls ./`cat .perses.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | .config.testPath" | tr -d '"'`
+#            cd ./`cat .perses.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | .config.testPath" | tr -d '"'`
+#            npm install
+#        # Run Custom Test
+#        - name: "Run Custom Test"
+#          run: |
+#            cd  .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/devices-logs/
+#            ls
+#            echo "------"
+#            node ../../../../`cat perses-config.yml | yq -c ".tests[] | select( .type | contains(\"custom\")) | tr -d '"'`
