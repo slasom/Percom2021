@@ -106,8 +106,8 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
                 try {
                     content = new JSONObject();
                     params = new JSONObject();
-                    params.put("beginDate","2019-06-09T09:00:28Z");
-                    params.put("endDate","2019-06-14T22:32:28Z");
+                    params.put("beginDate","2020-01-24T04:00:28Z");
+                    params.put("endDate","2020-01-26T23:32:28Z");
                     params.put("xmin","37.342856");
                     params.put("xmax","37.411237");
                     params.put("ymin","-6.004290");
