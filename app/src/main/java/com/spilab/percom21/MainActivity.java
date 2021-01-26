@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
 
             result = loadJSONFromAsset("locs.json");
-            //result = loadJSONFromAsset("S2_User0.json");
+           // result = loadJSONFromAsset("S1_User0.json");
 
 
             Log.e("SIMULATION NAME: ", "locs");
