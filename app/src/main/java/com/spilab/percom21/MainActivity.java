@@ -107,11 +107,13 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
                     content = new JSONObject();
                     params = new JSONObject();
                     params.put("beginDate","2020-01-24T04:00:28Z");
-                    params.put("endDate","2020-01-26T23:32:28Z");
-                    params.put("xmin","37.342856");
-                    params.put("xmax","37.411237");
-                    params.put("ymin","-6.004290");
-                    params.put("ymax","-5.947577");
+                    params.put("endDate","2020-01-25T23:32:28Z");
+                    params.put("xmin","60.153780");
+                    params.put("xmax","60.176914");
+                    params.put("ymin","24.903522");
+                    params.put("ymax","24.968465");
+
+
 
 
 
@@ -152,7 +154,12 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
         if (simulationName == null) {
 
             Log.e("Error: ", "No se ha introducido ningún nombre para la simulacion");
+
+
             result = loadJSONFromAsset("locs.json");
+            //result = loadJSONFromAsset("S2_User0.json");
+
+
             Log.e("SIMULATION NAME: ", "locs");
             Toast toast1 = Toast.makeText(this, "SIMULATION NAME: DEFAULT", Toast.LENGTH_LONG);
             toast1.show();

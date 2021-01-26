@@ -20,6 +20,9 @@ public class HeatMapResponse {
     @SerializedName("sender")
     private String sender;
 
+    @SerializedName("device")
+    private String device;
+
     @SerializedName("idRequest")
     private String idRequest;
 
@@ -61,6 +64,10 @@ public class HeatMapResponse {
 
     public String getSender() {
         return sender;
+    }
+
+    public String getDevice() {
+        return device;
     }
 
     public class Params {

@@ -132,7 +132,9 @@ public class MQTTService extends Service {
                 String msg = new String(mqttMessage.getPayload());
 
                 //RESULTS RECEIVED TO CALCULATE RISK
+
                 if (s.equals(MQTTService.getId())) {
+                    Log.i("JSON ",msg );
                     JSONArray json = null;
                     try {
                         json = new JSONArray(msg);
@@ -140,8 +142,8 @@ public class MQTTService extends Service {
                         }.getType();
                         List<LocationFrequency> list = gson.fromJson(String.valueOf(json), listType);
                         Log.i("LIST", list.toString());
-
-                        calculateRisk(list);
+                        if(list.size()>0)
+                            calculateRisk(list);
 
 
                     } catch (JSONException e) {
@@ -181,20 +183,20 @@ public class MQTTService extends Service {
         List<LocationFrequency> result = LocationManager.matchesHeatmaps(locations, heatmapPositiveCovid);
         Log.i("LISTA FINALLLL: ", result.toString());
 
-        int percentageRisk=0;
-        if(result.size()>= 10){
+        int percentageRisk = 0;
+        if (result.size() >= 10) {
             //Risk 100%
-            percentageRisk=100;
-            MainActivity.percentageRisk.setText(percentageRisk+"%");
-        }else{
-            percentageRisk=result.size()*10;
-            MainActivity.percentageRisk.setText(percentageRisk+"%");
+            percentageRisk = 100;
+            MainActivity.percentageRisk.setText(percentageRisk + "%");
+        } else {
+            percentageRisk = result.size() * 10;
+            MainActivity.percentageRisk.setText(percentageRisk + "%");
             //Set Risk; size * 10
         }
 
         MqttClient client = new MqttClient();
         try {
-            client.publishMessage(getClient(), String.valueOf(percentageRisk),1,"Covid19PERCOM/saveResult");
+            client.publishMessage(getClient(), String.valueOf(percentageRisk), 1, "Covid19PERCOM/saveResult");
 
         } catch (MqttException e) {
             e.printStackTrace();
@@ -215,23 +217,25 @@ public class MQTTService extends Service {
 
 
                     HeatMapResponse mapresponse = gson.fromJson(String.valueOf(data), HeatMapResponse.class);
-                    Exception error = new HeatMapResource(getApplicationContext()).executeMethod(mapresponse);
+                    Log.i("añlskdjf", mapresponse.getDevice()+"//"+getId());
+                    if (!mapresponse.getDevice().equals(getId())) {
+                        Exception error = new HeatMapResource(getApplicationContext()).executeMethod(mapresponse);
 
-                    if (error != null) {
-                        Log.e("Error", error.toString());
-                        break;
+                        if (error != null) {
+                            Log.e("Error", error.toString());
+                            break;
+                        }
+
+                        long difference = System.currentTimeMillis() - startTime;
+
+                        Log.i("Execution Time: ", String.valueOf(difference));
+
+                        //TODO Choose what type of notification to show (toast or notification in the bar)
+                        showToastInIntentService("Resource Execution: " + mapresponse.getResource() + " | Method: " + mapresponse.getMethod());
+
+
+                        //////
                     }
-
-                    long difference = System.currentTimeMillis() - startTime;
-
-                    Log.i("Execution Time: ", String.valueOf(difference));
-
-                    //TODO Choose what type of notification to show (toast or notification in the bar)
-                    showToastInIntentService("Resource Execution: " + mapresponse.getResource() + " | Method: " + mapresponse.getMethod());
-
-
-                    //////
-
                 } catch (Exception e) {
                     Log.e("Err MapResponse", e.getMessage());
                 }

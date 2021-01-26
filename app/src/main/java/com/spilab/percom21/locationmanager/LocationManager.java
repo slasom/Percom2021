@@ -262,18 +262,18 @@ public class LocationManager {
         return locationFreqs;
     }
 
-    public static List<LocationFrequency> matchesHeatmaps (List<LocationFrequency> locationFreqs,List<LocationFrequency> locations){
+    public static List<LocationFrequency> matchesHeatmaps (List<LocationFrequency> locations,List<LocationFrequency> locationsPositive){
 
         List<LocationFrequency> matchesList= new ArrayList<>();
 
         for (LocationFrequency element : locations) {
-            LocationFrequency location = searchLocation(locationFreqs, element);
+            LocationFrequency location = searchLocation(locationsPositive, element);
             if (location != null) {
                 matchesList.add(location);
                 //location.incFrequency(element.getFrequency());
             }
         }
-        return locationFreqs;
+        return matchesList;
     }
 
     public static LocationFrequency searchLocation (List<LocationFrequency> locations, LocationFrequency location){
