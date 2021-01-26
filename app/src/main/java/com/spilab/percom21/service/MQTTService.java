@@ -134,14 +134,13 @@ public class MQTTService extends Service {
                 //RESULTS RECEIVED TO CALCULATE RISK
 
                 if (s.equals(MQTTService.getId())) {
-                    Log.i("JSON ",msg );
                     JSONArray json = null;
                     try {
                         json = new JSONArray(msg);
                         Type listType = new TypeToken<List<LocationFrequency>>() {
                         }.getType();
                         List<LocationFrequency> list = gson.fromJson(String.valueOf(json), listType);
-                        Log.i("LIST", list.toString());
+                        Log.i("LIST RECEIVED", list.toString());
                         if(list.size()>0)
                             calculateRisk(list);
 
@@ -178,7 +177,7 @@ public class MQTTService extends Service {
 
         List<LocationFrequency> locations = LocationManager.getLocationHistoryByDate(DemoUtils.beginDate, DemoUtils.endDate);
 
-        Log.i("LISTA FINAL INICIAL: ", locations.toString());
+        Log.i("LISTA LOCAL: ", locations.toString());
         Log.i("LISTA RECIBIDA: ", heatmapPositiveCovid.toString());
 
         List<LocationFrequency> result = LocationManager.matchesHeatmaps(locations, heatmapPositiveCovid);

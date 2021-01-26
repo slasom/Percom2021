@@ -46,7 +46,7 @@ public class LocationManager {
 
     public static List<LocationFrequency> getLocationHistoryByDate(Date begin, Date end){
 
-        List<LocationFrequency> locs = aggreateLocations(convertLocations(getLocationHistory(begin, end)));
+        List<LocationFrequency> locs = aggreateLocationsV2(convertLocations(getLocationHistory(begin, end)));
 
         return locs;
     }
@@ -234,6 +234,21 @@ public class LocationManager {
         return new LocationFrequency(latBucket,lonBucket,1);
     }
 
+    private static LocationFrequency setBucketsV2(LocationFrequency location) {
+        //Lat+long bucket
+        Double latBucket = null;
+        Double lonBucket = null;
+        DecimalFormat df = new DecimalFormat("#.####");
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        df.setDecimalFormatSymbols(symbols);
+        df.setRoundingMode(RoundingMode.DOWN);
+        latBucket = Double.parseDouble(df.format(location.getLatitude()));
+        lonBucket = Double.parseDouble(df.format(location.getLongitude()));
+        //Bucketed location
+        return new LocationFrequency(latBucket,lonBucket,location.getFrequency());
+    }
+
     public static List<LocationFrequency> aggreateLocations(List<LocationFrequency> locations){
         List<LocationFrequency> locationFreqs = new ArrayList<LocationFrequency>();
         for (LocationFrequency element : locations) {
@@ -250,12 +265,11 @@ public class LocationManager {
     public static List<LocationFrequency> aggreateLocationsV2(List<LocationFrequency> locations){
         List<LocationFrequency> locationFreqs = new ArrayList<LocationFrequency>();
         for (LocationFrequency element : locations) {
-            element = setBuckets(element);
+            element=setBucketsV2(element);
             LocationFrequency location = searchLocation(locationFreqs, element);
             if (location != null) {
-                //location.incFrequency(element.getFrequency());
+                location.incFrequency(element.getFrequency());
             } else {
-                element.setFrequency(0);
                 locationFreqs.add(element);
             }
         }

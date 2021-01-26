@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
                     /// SIMULATION BUS
                     params.put("beginDate","2020-02-19T04:00:28Z");
-                    params.put("endDate","2020-02-21T23:32:28Z");
+                    params.put("endDate","2020-02-22T23:32:28Z");
                     params.put("xmin","37.361733");
                     params.put("xmax","37.421557");
                     params.put("ymin","-6.002593");
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
 
             result = loadJSONFromAsset("locs.json");
-            //result = loadJSONFromAsset("S2_User0.json");
+            //result = loadJSONFromAsset("SB_User0.json");
 
 
             Log.e("SIMULATION NAME: ", "locs");
