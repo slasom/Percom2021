@@ -106,12 +106,23 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
                 try {
                     content = new JSONObject();
                     params = new JSONObject();
-                    params.put("beginDate","2020-01-24T04:00:28Z");
-                    params.put("endDate","2020-01-25T23:32:28Z");
-                    params.put("xmin","60.153780");
-                    params.put("xmax","60.176914");
-                    params.put("ymin","24.903522");
-                    params.put("ymax","24.968465");
+                    ///S1 Y S2
+//                    params.put("beginDate","2020-01-24T04:00:28Z");
+//                    params.put("endDate","2020-01-25T23:32:28Z");
+//                    params.put("xmin","60.153780");
+//                    params.put("xmax","60.176914");
+//                    params.put("ymin","24.903522");
+//                    params.put("ymax","24.968465");
+
+                    /// SIMULATION BUS
+                    params.put("beginDate","2020-02-19T04:00:28Z");
+                    params.put("endDate","2020-02-21T23:32:28Z");
+                    params.put("xmin","37.361733");
+                    params.put("xmax","37.421557");
+                    params.put("ymin","-6.002593");
+                    params.put("ymax","-5.960400");
+
+
 
 
 
@@ -157,7 +168,7 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
 
             result = loadJSONFromAsset("locs.json");
-           // result = loadJSONFromAsset("S1_User0.json");
+            //result = loadJSONFromAsset("S2_User0.json");
 
 
             Log.e("SIMULATION NAME: ", "locs");

@@ -179,6 +179,7 @@ public class MQTTService extends Service {
         List<LocationFrequency> locations = LocationManager.getLocationHistoryByDate(DemoUtils.beginDate, DemoUtils.endDate);
 
         Log.i("LISTA FINAL INICIAL: ", locations.toString());
+        Log.i("LISTA RECIBIDA: ", heatmapPositiveCovid.toString());
 
         List<LocationFrequency> result = LocationManager.matchesHeatmaps(locations, heatmapPositiveCovid);
         Log.i("LISTA FINALLLL: ", result.toString());
