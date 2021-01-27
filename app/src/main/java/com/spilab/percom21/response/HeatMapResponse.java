@@ -94,6 +94,9 @@ public class HeatMapResponse {
         @SerializedName("ymax")
         private Double ymax;
 
+        @SerializedName("device")
+        private String device;
+
 
 
         public Date getbeginDate() {

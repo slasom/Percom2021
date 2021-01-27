@@ -24,6 +24,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.spilab.percom21.demo.DemoUtils;
 import com.spilab.percom21.locationmanager.LocationManager;
 import com.spilab.percom21.model.LocationFrequency;
 import com.spilab.percom21.response.HeatMapResponse;
@@ -44,18 +45,13 @@ import java.util.List;
 public class HeatMapResource {
 
     private Context context;
-    private RequestQueue request;
-
     private HeatMapResponse mapResponse;
-
     private Gson gson;
     private MqttClient client;
 
-
     public HeatMapResource(Context context) {
         this.context = context;
-        //request = Volley.newRequestQueue(context);
-        gson =  new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+        gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
         client = new MqttClient();
     }
 
@@ -67,13 +63,15 @@ public class HeatMapResource {
             case "getHeatmaps":
                 getHeatmaps(response.getParams().getbeginDate(), response.getParams().getendDate(), response.getParams().getXMin(), response.getParams().getXMax(), response.getParams().getYMin(), response.getParams().getYMax());
                 break;
-                default:
-                client.publishMessage( MQTTService.getClient(), "Error: Not Found Method",1,mapResponse.getSender());
+            case "getRiskDevice":
+                getRiskPercentage();
+                break;
+
+            default:
+                client.publishMessage(MQTTService.getClient(), "Error: Not Found Method", 1, mapResponse.getSender());
                 return new Exception("Not found method.");
 
-//            case "getSCHeatmaps":
-//                getSCHeatmaps(response.getParams().getbeginDate(),response.getParams().getendDate(),response.getParams().getlatitude(),response.getParams().getlongitude(),response.getParams().getradius(),response.getParams().getdevices());
-//                break;
+//
         }
 
         return null;
@@ -96,43 +94,50 @@ public class HeatMapResource {
         }
     }
 
-//    /**
-//     * Get the locations frequency processed in the aggregator
-//     *
-//     * @param beginDate init date
-//     * @param endDate end date
-//     * @param latitude latitude
-//     * @param longitude longitude
-//     * @param radius radius
-//     * @param devices number of devices
-//     * @return List<LocationFrequency>
-//     */
-//    public List<LocationFrequency> getSCHeatmaps(Date beginDate, Date endDate, Double latitude, Double longitude, Double radius, Integer devices) {
-//
-//        //new GetLocations().execute();
-//
-//        List<LocationBeanRealm> locations = LocationManager.getLocationsFilter(beginDate, endDate);
-//        Log.e("Locations size", String.valueOf(locations.size()));
-//        try {
-//            sendReply(mapResponse.getSender(), mapResponse.getIdRequest(), new JSONArray(gson.toJson(locations)), devices);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//        return null;
-//    }
+    public void getRiskPercentage() {
 
-    private void sendReply(String url, String idRequest, JSONArray list) throws MqttException, UnsupportedEncodingException{
+        DemoUtils.setIdRequest(mapResponse.getIdRequest());
+        //SEND REQUEST DEMO SIMULATION
 
+        JSONObject content = null;
+        JSONObject params = null;
+        try {
+            content = new JSONObject();
+            params = new JSONObject();
+            ///S1 Y S2
+            params.put("beginDate", "2020-01-24T04:00:28Z");
+            params.put("endDate", "2020-01-25T23:32:28Z");
+            params.put("xmin", "60.153780");
+            params.put("xmax", "60.176914");
+            params.put("ymin", "24.903522");
+            params.put("ymax", "24.968465");
+
+            content.put("resource", "Map");
+            content.put("method", "getHeatmaps");
+            content.put("sender", DemoUtils.getDeviceID());
+            content.put("params", params);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            client.publishMessage(MQTTService.getClient(), String.valueOf(content), 1, "Covid19PERCOM/request");
+        } catch (MqttException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void sendReply(String url, String idRequest, JSONArray list) throws MqttException, UnsupportedEncodingException {
 
         JSONObject content = null;
         try {
-
             content = new JSONObject();
             content.put("idRequest", idRequest);
             content.put("body", list);
-
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -140,82 +145,8 @@ public class HeatMapResource {
 
         Log.e("LocationFrequency", String.valueOf(content));
 
-        client.publishMessage( MQTTService.getClient(), String.valueOf(content),1,mapResponse.getSender());
-
-
-//        jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, content, new Response.Listener<JSONObject>() {
-//            @Override
-//            public void onResponse(JSONObject response) {
-//                Log.d("OK: ", String.valueOf(response));
-//
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Toast.makeText(context, error.toString(), Toast.LENGTH_LONG).show();
-//                System.out.println();
-//                Log.d("ERROR: ", error.toString());
-//            }
-//        }
-//        );
-//
-//        request.add(jsonObjectRequest);
+        client.publishMessage(MQTTService.getClient(), String.valueOf(content), 1, mapResponse.getSender());
 
     }
-
-    private static <T> List<List<T>> partition(List<T> input, int size) {
-        List<List<T>> lists = new ArrayList<List<T>>();
-        for (int i = 0; i < input.size(); i += size) {
-            lists.add(input.subList(i, Math.min(input.size(), i + size)));
-        }
-        return lists;
-    }
-
-
-    private void enviarRespuesta(String url, String id, JSONArray array) {
-        JsonObjectRequest jsonObjectRequest = null;
-
-        String jString = "{\n" +
-                "                \"date\": \"bbbb\",\n" +
-                "                \"latitude\": 39.4786221,\n" +
-                "                \"longitude\": -6.3419389\n" +
-                "            }";
-
-        JSONObject content = null;
-        JSONObject body = null;
-        try {
-            body = new JSONObject();
-            body.put("personaX", array);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        try {
-            content = new JSONObject();
-            content.put("idRequest", id);
-            content.put("body", body);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, content, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.d("OK: ", String.valueOf(response));
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, error.toString(), Toast.LENGTH_LONG).show();
-                System.out.println();
-                Log.d("ERROR: ", error.toString());
-            }
-        }
-        );
-
-
-        request.add(jsonObjectRequest);
-    }
-
 
 }

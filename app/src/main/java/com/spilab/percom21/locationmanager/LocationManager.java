@@ -28,7 +28,7 @@ public class LocationManager {
 
     public static boolean mapFinishedFlag = true;
 
-    public static List<LocationFrequency> getLocationHistory(Date begin, Date end, double latitude, double longitude, double radius){
+    public static List<LocationFrequency> getLocationHistory(Date begin, Date end, double latitude, double longitude, double radius) {
 
         List<LocationFrequency> locs = aggreateLocations(
                 filterLocation(convertLocations(getLocationHistory(begin, end)), latitude, longitude, radius));
@@ -36,22 +36,22 @@ public class LocationManager {
         return locs;
     }
 
-    public static List<LocationFrequency> getLocationHistoryV2(Date begin, Date end, double xmin, double xmax, double ymin, double ymax){
+    public static List<LocationFrequency> getLocationHistoryV2(Date begin, Date end, double xmin, double xmax, double ymin, double ymax) {
 
         List<LocationFrequency> locs = aggreateLocations(
-                filterLocationV2(convertLocations(getLocationHistory(begin, end)), xmin, xmax, ymin,ymax));
+                filterLocationV2(convertLocations(getLocationHistory(begin, end)), xmin, xmax, ymin, ymax));
 
         return locs;
     }
 
-    public static List<LocationFrequency> getLocationHistoryByDate(Date begin, Date end){
+    public static List<LocationFrequency> getLocationHistoryByDate(Date begin, Date end) {
 
         List<LocationFrequency> locs = aggreateLocationsV2(convertLocations(getLocationHistory(begin, end)));
 
         return locs;
     }
 
-    public static List<LocationFrequency> getAllLocationsHistory(){
+    public static List<LocationFrequency> getAllLocationsHistory() {
 
         List<LocationFrequency> locs = aggreateLocations(
                 convertLocations(getAllLocations()));
@@ -59,10 +59,10 @@ public class LocationManager {
         return locs;
     }
 
-    public static List<LocationFrequency> convertLocations (List<LocationBeanRealm> locs){
+    public static List<LocationFrequency> convertLocations(List<LocationBeanRealm> locs) {
         //Log.i("HEATMAP-CONVERSION"," - Convirtiendo localizaciones...");
         List<LocationFrequency> locationFreqs = new ArrayList<LocationFrequency>();
-        for (LocationBeanRealm l: locs ) {
+        for (LocationBeanRealm l : locs) {
             LocationFrequency lFrequency = new LocationFrequency(l.getLat(), l.getLng(), 1);
             //Log.e("HEATMAP", nimLoc.getLatitude() + " " + nimLoc.getLongitude() + " " + nimLoc.getStartDate()+ " " + nimLoc.getEndDate());
             locationFreqs.add(lFrequency);
@@ -70,14 +70,14 @@ public class LocationManager {
         return locationFreqs;
     }
 
-    public static List<LocationBeanRealm> getLocationHistory(Date begin, Date end){
+    public static List<LocationBeanRealm> getLocationHistory(Date begin, Date end) {
         //Log.i("HEATMAP-QUERY"," - Buscando localizaciones...");
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .modules(new LocationBeanRealmModule())
                 .name("Database.realm")
                 .deleteRealmIfMigrationNeeded()
                 .build();
-        Realm realm= Realm.getInstance(config);
+        Realm realm = Realm.getInstance(config);
         RealmResults<LocationBeanRealm> locations = realm.where(LocationBeanRealm.class)
                 .greaterThanOrEqualTo("timestamp", begin)
                 .lessThan("timestamp", end)
@@ -85,21 +85,21 @@ public class LocationManager {
 
         //Log.i("HEATMAP-ENCONTRADAS="," - " + String.valueOf(locations.size()));
         List<LocationBeanRealm> locs = new ArrayList<LocationBeanRealm>();
-        for(LocationBeanRealm l : locations){
+        for (LocationBeanRealm l : locations) {
             locs.add(l);
             //Log.i("HEATMAP-ENCONTRADA"," ->"+l.toString());
         }
         return locs;
     }
 
-    public static List<LocationBeanRealm> getAllLocations(){
+    public static List<LocationBeanRealm> getAllLocations() {
         //Log.i("HEATMAP-QUERY"," - Buscando localizaciones...");
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .modules(new LocationBeanRealmModule())
                 .name("Database.realm")
                 .deleteRealmIfMigrationNeeded()
                 .build();
-        Realm realm= Realm.getInstance(config);
+        Realm realm = Realm.getInstance(config);
         List<LocationBeanRealm> locs = realm.where(LocationBeanRealm.class)
                 .findAll();
 
@@ -108,14 +108,14 @@ public class LocationManager {
         return locs;
     }
 
-    public static List<LocationBeanRealm> getLocationsFilter(Date beginDate, Date endDate){
+    public static List<LocationBeanRealm> getLocationsFilter(Date beginDate, Date endDate) {
         //Log.i("HEATMAP-QUERY"," - Buscando localizaciones...");
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .modules(new LocationBeanRealmModule())
                 .name("Database.realm")
                 .deleteRealmIfMigrationNeeded()
                 .build();
-        Realm realm= Realm.getInstance(config);
+        Realm realm = Realm.getInstance(config);
         List<LocationBeanRealm> locs = realm.where(LocationBeanRealm.class)
                 .greaterThanOrEqualTo("timestamp", beginDate)
                 .lessThan("timestamp", endDate)
@@ -128,18 +128,18 @@ public class LocationManager {
 
 
     public static List<LocationFrequency> filterLocation(List<LocationFrequency> locations, double latitude, double longitude, double radius) {
-        List<LocationFrequency> results=new ArrayList<LocationFrequency>();
-        PointF origin = new PointF((float)latitude, (float)longitude);
+        List<LocationFrequency> results = new ArrayList<LocationFrequency>();
+        PointF origin = new PointF((float) latitude, (float) longitude);
         PointF north = calculateDerivedPosition(origin, radius, 0);
         PointF east = calculateDerivedPosition(origin, radius, 90);
         PointF south = calculateDerivedPosition(origin, radius, 180);
         PointF west = calculateDerivedPosition(origin, radius, 270);
 
 
-        for(LocationFrequency location:locations){
+        for (LocationFrequency location : locations) {
             location = setBuckets(location);
-            if(location.getLatitude()>south.x && location.getLatitude()<north.x
-                    && location.getLongitude()>west.y && location.getLongitude()<east.y){
+            if (location.getLatitude() > south.x && location.getLatitude() < north.x
+                    && location.getLongitude() > west.y && location.getLongitude() < east.y) {
                 results.add(location);
             }
         }
@@ -147,7 +147,7 @@ public class LocationManager {
     }
 
     public static List<LocationFrequency> filterLocationV2(List<LocationFrequency> locations, double xmin, double xmax, double ymin, double ymax) {
-        List<LocationFrequency> results=new ArrayList<LocationFrequency>();
+        List<LocationFrequency> results = new ArrayList<LocationFrequency>();
 //        PointF origin = new PointF((float)latitude, (float)longitude);
 //        PointF north = calculateDerivedPosition(origin, radius, 0);
 //        PointF east = calculateDerivedPosition(origin, radius, 90);
@@ -155,11 +155,11 @@ public class LocationManager {
 //        PointF west = calculateDerivedPosition(origin, radius, 270);
         long startTime = System.currentTimeMillis();
 
-        for(LocationFrequency location:locations){
+        for (LocationFrequency location : locations) {
             location = setBuckets(location);
 
-            if(location.getLatitude() >= xmin && location.getLatitude() <= xmax
-                    && location.getLongitude() >= ymin && location.getLongitude() <= ymax){
+            if (location.getLatitude() >= xmin && location.getLatitude() <= xmax
+                    && location.getLongitude() >= ymin && location.getLongitude() <= ymax) {
                 results.add(location);
             }
 
@@ -173,20 +173,18 @@ public class LocationManager {
         Log.i("filter Time: ", String.valueOf(difference));
         return results;
     }
+
     /**
      * Calculates the end-point from a given source at a given range (meters)
      * and bearing (degrees). This methods uses simple geometry equations to
      * calculate the end-point.
      *
-     * @param point
-     *            Point of origin
-     * @param range
-     *            Range in meters
-     * @param bearing
-     *            Bearing in degrees
+     * @param point   Point of origin
+     * @param range   Range in meters
+     * @param bearing Bearing in degrees
      * @return End-point from the source given the desired range and bearing.
      */
-    private static PointF calculateDerivedPosition(PointF point, double range, double bearing){
+    private static PointF calculateDerivedPosition(PointF point, double range, double bearing) {
         double EarthRadius = 6371000; // m
 
         double latA = Math.toRadians(point.x);
@@ -217,7 +215,6 @@ public class LocationManager {
     /**
      * This method calculates the position and time buckets for the latitude and longitude received. The closer
      * the coordinates are to the poles, the smaller is the area covered by the bucket. The time bucket for a time string using 15 minutes buckets
-     *
      */
     private static LocationFrequency setBuckets(LocationFrequency location) {
         //Lat+long bucket
@@ -231,7 +228,7 @@ public class LocationManager {
         latBucket = Double.parseDouble(df.format(location.getLatitude()));
         lonBucket = Double.parseDouble(df.format(location.getLongitude()));
         //Bucketed location
-        return new LocationFrequency(latBucket,lonBucket,1);
+        return new LocationFrequency(latBucket, lonBucket, 1);
     }
 
     private static LocationFrequency setBucketsV2(LocationFrequency location) {
@@ -246,10 +243,10 @@ public class LocationManager {
         latBucket = Double.parseDouble(df.format(location.getLatitude()));
         lonBucket = Double.parseDouble(df.format(location.getLongitude()));
         //Bucketed location
-        return new LocationFrequency(latBucket,lonBucket,location.getFrequency());
+        return new LocationFrequency(latBucket, lonBucket, location.getFrequency());
     }
 
-    public static List<LocationFrequency> aggreateLocations(List<LocationFrequency> locations){
+    public static List<LocationFrequency> aggreateLocations(List<LocationFrequency> locations) {
         List<LocationFrequency> locationFreqs = new ArrayList<LocationFrequency>();
         for (LocationFrequency element : locations) {
             LocationFrequency location = searchLocation(locationFreqs, element);
@@ -262,10 +259,10 @@ public class LocationManager {
         return locationFreqs;
     }
 
-    public static List<LocationFrequency> aggreateLocationsV2(List<LocationFrequency> locations){
+    public static List<LocationFrequency> aggreateLocationsV2(List<LocationFrequency> locations) {
         List<LocationFrequency> locationFreqs = new ArrayList<LocationFrequency>();
         for (LocationFrequency element : locations) {
-            element=setBucketsV2(element);
+            element = setBucketsV2(element);
             LocationFrequency location = searchLocation(locationFreqs, element);
             if (location != null) {
                 location.incFrequency(element.getFrequency());
@@ -276,24 +273,27 @@ public class LocationManager {
         return locationFreqs;
     }
 
-    public static List<LocationFrequency> matchesHeatmaps (List<LocationFrequency> locations,List<LocationFrequency> locationsPositive){
+    public static List<LocationFrequency> matchesHeatmaps(List<LocationFrequency> locations, List<LocationFrequency> locationsPositive) {
 
-        List<LocationFrequency> matchesList= new ArrayList<>();
+        List<LocationFrequency> matchesList = new ArrayList<>();
 
         for (LocationFrequency element : locations) {
             LocationFrequency location = searchLocation(locationsPositive, element);
             if (location != null) {
                 matchesList.add(location);
-                //location.incFrequency(element.getFrequency());
+
             }
         }
+
+
         return matchesList;
     }
 
-    public static LocationFrequency searchLocation (List<LocationFrequency> locations, LocationFrequency location){
-        for (LocationFrequency element:locations  ) {
-            if (element.equals(location)){
-                return  element;
+
+    public static LocationFrequency searchLocation(List<LocationFrequency> locations, LocationFrequency location) {
+        for (LocationFrequency element : locations) {
+            if (element.equals(location)) {
+                return element;
             }
         }
         return null;
@@ -305,8 +305,8 @@ public class LocationManager {
                 .name("heatmap.realm")
                 .deleteRealmIfMigrationNeeded()
                 .build();
-        Realm realm= Realm.getInstance(config);
-        if(!LocationManager.mapFinishedFlag) {
+        Realm realm = Realm.getInstance(config);
+        if (!LocationManager.mapFinishedFlag) {
             realm.beginTransaction();
             for (LocationFrequency location : locationList) {
                 realm.copyToRealm(location);
@@ -317,17 +317,17 @@ public class LocationManager {
     }
 
     public static List<LocationFrequency> getLocations() {
-        LocationManager.mapFinishedFlag=true;
+        LocationManager.mapFinishedFlag = true;
 
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .modules(new LocationFrequencyModule())
                 .name("heatmap.realm")
                 .deleteRealmIfMigrationNeeded()
                 .build();
-        Realm realm= Realm.getInstance(config);
+        Realm realm = Realm.getInstance(config);
         realm.beginTransaction();
         List<LocationFrequency> result = realm.where(LocationFrequency.class).findAll();
-        result= aggreateLocations(result);
+        result = aggreateLocations(result);
         realm.commitTransaction();
         return result;
     }
@@ -338,7 +338,7 @@ public class LocationManager {
                 .name("heatmap.realm")
                 .deleteRealmIfMigrationNeeded()
                 .build();
-        Realm realm= Realm.getInstance(config);
+        Realm realm = Realm.getInstance(config);
         realm.beginTransaction();
         realm.where(LocationFrequency.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();

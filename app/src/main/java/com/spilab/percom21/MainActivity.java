@@ -9,12 +9,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -28,6 +30,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.spilab.percom21.database.LocationBeanRealm;
 import com.spilab.percom21.database.LocationBeanRealmModule;
+import com.spilab.percom21.demo.DemoUtils;
 import com.spilab.percom21.service.MQTTService;
 import com.spilab.percom21.service.MqttClient;
 
@@ -50,15 +53,10 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
 
-public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallback*/ {
+public class MainActivity extends AppCompatActivity {
 
-
-    private static final String TYPE_UTF8_CHARSET = "UTF-8";
-    private Date currentTime;
     private boolean flag = false;
     private static final String TAG = "Location";
-    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 4321;
 
@@ -68,18 +66,9 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
     private Button buttonSendRequest;
     public static TextView percentageRisk;
-
-
     private static final String CARPETA_RAIZ = "HeatmapV3/";
-
-
-
     Intent mServiceIntent;
-
     private Gson gson;
-
-    private static String serverIp;
-
     private boolean startRealm = false;
 
 
@@ -90,15 +79,14 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        buttonSendRequest=(Button) findViewById(R.id.buttonSendRequest);
-        percentageRisk=(TextView) findViewById(R.id.textPercentage);
+        buttonSendRequest = (Button) findViewById(R.id.buttonSendRequest);
+        percentageRisk = (TextView) findViewById(R.id.textPercentage);
         client = new MqttClient();
-
+        gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
         buttonSendRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                buttonSendRequest.setTextColor(Color.RED);
                 //SEND REQUEST
 
                 JSONObject content = null;
@@ -107,92 +95,41 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
                     content = new JSONObject();
                     params = new JSONObject();
                     ///S1 Y S2
-//                    params.put("beginDate","2020-01-24T04:00:28Z");
-//                    params.put("endDate","2020-01-25T23:32:28Z");
-//                    params.put("xmin","60.153780");
-//                    params.put("xmax","60.176914");
-//                    params.put("ymin","24.903522");
-//                    params.put("ymax","24.968465");
-
-                    /// SIMULATION BUS
-                    params.put("beginDate","2020-02-19T04:00:28Z");
-                    params.put("endDate","2020-02-22T23:32:28Z");
-                    params.put("xmin","37.361733");
-                    params.put("xmax","37.421557");
-                    params.put("ymin","-6.002593");
-                    params.put("ymax","-5.960400");
-
-
-
-
-
-
+                    params.put("beginDate", "2020-01-24T04:00:28Z");
+                    params.put("endDate", "2020-01-25T23:32:28Z");
+                    params.put("xmin", "60.153780");
+                    params.put("xmax", "60.176914");
+                    params.put("ymin", "24.903522");
+                    params.put("ymax", "24.968465");
 
                     content.put("resource", "Map");
                     content.put("method", "getHeatmaps");
-                    content.put("sender", MQTTService.getId());
+                    content.put("sender", DemoUtils.getDeviceID());
                     content.put("params", params);
+
+                    client.publishMessage(MQTTService.getClient(), String.valueOf(content), 1, "Covid19PERCOM/request");
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
-
-                try {
-                    client.publishMessage( MQTTService.getClient(), String.valueOf(content),1,"Covid19PERCOM/request");
-                } catch (MqttException e) {
-                    e.printStackTrace();
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
+                } catch (MqttException e) {
+                    e.printStackTrace();
                 }
+
 
             }
         });
 
 
-
+        loadDemoSimulation();
         getStoragePermission();
         startServiceMQTT();
-        gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
 
-
-        /////// PARSE LOCALIZACIONES ESTATICAS //////////////
-        ArrayList<LocationBeanRealm> localizaciones = new ArrayList<>();
-
-        //GET FICHERO SIMULACION
-
-        String simulationName = getIntent().getStringExtra("param");
-        String result;
-        if (simulationName == null) {
-
-            Log.e("Error: ", "No se ha introducido ningún nombre para la simulacion");
-
-
-            result = loadJSONFromAsset("locs.json");
-            //result = loadJSONFromAsset("SB_User0.json");
-
-
-            Log.e("SIMULATION NAME: ", "locs");
-            Toast toast1 = Toast.makeText(this, "SIMULATION NAME: DEFAULT", Toast.LENGTH_LONG);
-            toast1.show();
-        } else {
-            Log.e("SIMULATION NAME: ", simulationName);
-            Toast toast1 = Toast.makeText(this, "SIMULATION NAME: "+ simulationName, Toast.LENGTH_LONG);
-            toast1.show();
-
-            result = loadJSONFromAsset(simulationName + ".json");
-        }
-        localizaciones = gson.fromJson(result, new TypeToken<List<LocationBeanRealm>>() {
-        }.getType());
-
-        Log.e("LISTA LOCALIZACIONES: ", String.valueOf(localizaciones.size()));
-
-        //TODO: Guardar localizaciones en la base de datos.
-        /////////////////////////////////////////////////////////
-        guardarLocsStaticas(localizaciones);
 
         // check location permission
         if (storagePermissionsGranted && mLocationPermissionsGranted) {
-             startServiceMQTT();
+            startServiceMQTT();
 
             Log.e("Start", " START SERVICE");
         } else {
@@ -201,22 +138,45 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
 
     }
 
+    void loadDemoSimulation() {
+        ArrayList<LocationBeanRealm> localizaciones;
+
+        //GET ARGS
+        String simulationName = getIntent().getStringExtra("param");
+        String deviceID = getIntent().getStringExtra("device");
+
+        if (deviceID != null)
+            DemoUtils.setDeviceID(deviceID);
+        else
+            DemoUtils.setDeviceID("Device0");
 
 
+        String result;
+        if (simulationName == null) {
+
+            Log.e("Error: ", "No se ha introducido ningún nombre para la simulacion");
+
+            //result = loadJSONFromAsset("locs.json");
+            result = loadJSONFromAsset("S2_User0.json");
 
 
-    public void restartAPP(Double timeout){
-        Intent mStartActivity = new Intent(getApplicationContext(), MainActivity.class);
-        int mPendingIntentId = 123456;
-        PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId,mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager mgr = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        mgr.set(AlarmManager.RTC, (long) (System.currentTimeMillis() + timeout), mPendingIntent);
-        System.exit(0);
+            Log.e("SIMULATION NAME: ", "locs");
+            Toast toast1 = Toast.makeText(this, "SIMULATION NAME: DEFAULT", Toast.LENGTH_LONG);
+            toast1.show();
+        } else {
+            Log.e("SIMULATION NAME: ", simulationName);
+            Toast toast1 = Toast.makeText(this, "SIMULATION NAME: " + simulationName, Toast.LENGTH_LONG);
+            toast1.show();
+
+            result = loadJSONFromAsset(simulationName + ".json");
+        }
+
+        localizaciones = gson.fromJson(result, new TypeToken<List<LocationBeanRealm>>() {
+        }.getType());
+
+        Log.e("LISTA LOCALIZACIONES: ", String.valueOf(localizaciones.size()));
+        guardarLocsStaticas(localizaciones);
     }
-
-
-
-
 
 
     public String loadJSONFromAsset(String filename) {
@@ -235,31 +195,6 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
         return json;
     }
 
-
-    private void writeFileExternalStorage(Double lat, Double lng) {
-
-        try {
-            File myExternalFile = new File(Environment.getExternalStorageDirectory(), CARPETA_RAIZ);
-
-            if (!myExternalFile.exists())
-                myExternalFile.mkdir();
-
-            String request= "new google.maps.LatLng("+lat+","+lng+"),\n";
-
-
-            Writer output;
-            output = new BufferedWriter(new FileWriter(myExternalFile+ File.separator + "example.txt",true));  //clears file every time
-            output.append(request);
-            output.close();
-
-            Log.d(TAG, " - File WRITED successfully");
-
-        } catch (IOException e) {
-            Log.d(TAG, " - Error LOADED file");
-            e.printStackTrace();
-        }
-
-    }
 
     public void guardarLocsStaticas(ArrayList<LocationBeanRealm> localizaciones) {
 
@@ -302,7 +237,6 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
         }
 
 
-
     }
 
     private void startServiceMQTT() {
@@ -314,23 +248,18 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
         mServiceIntent = new Intent(this, service.getClass());
 
 
-       // mServiceIntent.putExtra("profile", profile);
+        // mServiceIntent.putExtra("profile", profile);
 
         boolean run = isMyServiceRunning(service.getClass());
-          Log.d(TAG, " - Run1: " + run);
-          if (!isMyServiceRunning(service.getClass())) {
-              //mServiceIntent.putExtra("profile", profile);
+        Log.d(TAG, " - Run1: " + run);
+        if (!isMyServiceRunning(service.getClass())) {
+            //mServiceIntent.putExtra("profile", profile);
             startService(mServiceIntent);
 
-          }
-          Log.d(TAG, " - Run1: " + run);
+        }
+        Log.d(TAG, " - Run1: " + run);
 
     }
-
-
-
-
-
 
 
     private void getStoragePermission() {
@@ -410,12 +339,11 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Double timeout = (Double) intent.getExtras().get("timeout");
-            restartAPP(timeout);
+//            Double timeout = (Double) intent.getExtras().get("timeout");
+//            restartAPP(timeout);
         }
     };
     //TODO: cAMBIAR PARA QUE VUELVA A PINTAR
-
 
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -429,8 +357,6 @@ public class MainActivity extends AppCompatActivity /*implements OnMapReadyCallb
         Log.i("Service status", "Not running");
         return false;
     }
-
-
 
 
 }

@@ -1,5 +1,8 @@
 package com.spilab.percom21;
 
+import android.graphics.Color;
+
+import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -13,6 +16,8 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.matcher.ViewMatchers.hasBackground;
+import static androidx.test.espresso.matcher.ViewMatchers.hasTextColor;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
@@ -20,7 +25,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
     @LargeTest
     public class HelloWorldEspressoTest {
 
-        public static final String STRING_TO_BE_TYPED = "Hello Percom 2021";
+
 
 
     @Rule public ActivityScenarioRule<MainActivity> activityScenarioRule
@@ -35,13 +40,15 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
     @Test
     public void changeText_sameActivity() {
         // Type text and then press the button.
-        onView(withId(R.id.editTextTextPersonName))
-                .perform(typeText(STRING_TO_BE_TYPED), closeSoftKeyboard());
+//        onView(withId(R.id.editTextTextPersonName))
+//                .perform(typeText(STRING_TO_BE_TYPED), closeSoftKeyboard());
+
+        onView(withId((R.id.buttonSendRequest))).perform(click());
         //onView(withId(R.id.changeTextBt)).perform(click());
 
-        // Check that the text was changed.
-        onView(withText("Hello Percom 2021")).check(ViewAssertions.matches(withText(STRING_TO_BE_TYPED)));
 
+        onView(withId(R.id.buttonSendRequest)).check(ViewAssertions.matches(hasTextColor(Color.RED) ));
+        //onView(withId(R.id.buttonSendRequest)).check(ViewAssertions.matches(bac ));
     }
 
 }

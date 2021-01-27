@@ -4,7 +4,7 @@
 project_name: "Perses Test"
 
 #Author: Name of the operator. Used as a prefix to avoid name collision on.
-author: "spilab"
+author: "percom21"
 
 ######### EC2 Configuration #########
 
@@ -55,13 +55,10 @@ application_id: "com.spilab.percom21"
 
 #Time to wait for the deployment of Android devices (1m '1 minute', 1h '1 hour')
 #For example, for deploy 50 devices, wait 20m '20 minutes'
-time_wait: "9m"
+time_wait: "8m"
 
 
 ######### Tests Definition #########
-
-log_tags:
-  - "HeatmapLog"
 
 tests:
 #  - id: "GUI Performance"
@@ -76,10 +73,20 @@ tests:
       concurrentUsers: 3
       iterations: 5
       delay: 500
-      url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=3&timeout=2500"
+      url: "http://108.129.48.139/risk?device=Device1"
     expect:
       mean:
-        under: 6000
+        under: 2000
+  - id: "Observed Performance2"
+      type: "apipecker"
+      config:
+        concurrentUsers: 6
+        iterations: 8
+        delay: 500
+        url: "http://108.129.48.139/risk?device=Device2"
+      expect:
+        mean:
+          under: 2000
 #  - id: "Observed Performance2"
 #    type: "apipecker"
 #    config:
