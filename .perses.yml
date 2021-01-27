@@ -78,15 +78,15 @@ tests:
       mean:
         under: 2000
   - id: "Observed Performance2"
-      type: "apipecker"
-      config:
-        concurrentUsers: 6
-        iterations: 8
-        delay: 500
-        url: "http://108.129.48.139/risk?device=Device2"
-      expect:
-        mean:
-          under: 2000
+    type: "apipecker"
+    config:
+      concurrentUsers: 6
+      iterations: 8
+      delay: 500
+      url: "http://108.129.48.139/risk?device=Device2"
+    expect:
+      mean:
+        under: 2000
 #  - id: "Observed Performance2"
 #    type: "apipecker"
 #    config:
