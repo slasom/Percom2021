@@ -143,8 +143,8 @@ public class MQTTService extends Service {
                         }.getType();
                         List<LocationFrequency> list = gson.fromJson(String.valueOf(json), listType);
                         Log.i("SIZE LIST RECEIVED", String.valueOf(list.size()));
-                        if (list.size() > 0)
-                            calculateRisk(list);
+
+                        calculateRisk(list);
 
 
                     } catch (JSONException e) {
@@ -176,48 +176,53 @@ public class MQTTService extends Service {
 
     private void calculateRisk(List<LocationFrequency> heatmapPositiveCovid) {
 
-
-        List<LocationFrequency> locations = LocationManager.getLocationHistoryByDate(DemoUtils.beginDate, DemoUtils.endDate);
-
-        Log.i("LISTA LOCAL: ", locations.toString());
-        Log.i("LISTA RECIBIDA: ", heatmapPositiveCovid.toString());
-
-        List<LocationFrequency> result = LocationManager.matchesHeatmaps(locations, heatmapPositiveCovid);
-        Log.i("LISTA FINALLLL: ", result.toString());
-
         int percentageRisk = 0;
-        if (result.size() >= 10) {
-            //Risk 100%
-            percentageRisk = 100;
-            MainActivity.percentageRisk.setText(percentageRisk + "%");
-        } else {
-            percentageRisk = result.size() * 10;
-            MainActivity.percentageRisk.setText(percentageRisk + "%");
-            //Set Risk; size * 10
+        if (heatmapPositiveCovid.size() > 0) {
+
+            List<LocationFrequency> locations = LocationManager.getLocationHistoryByDate(DemoUtils.beginDate, DemoUtils.endDate);
+
+            Log.i("LISTA LOCAL: ", locations.toString());
+            Log.i("LISTA RECIBIDA: ", heatmapPositiveCovid.toString());
+
+            List<LocationFrequency> result = LocationManager.matchesHeatmaps(locations, heatmapPositiveCovid);
+            Log.i("LISTA FINALLLL: ", result.toString());
+
+
+            if (result.size() >= 10) {
+                //Risk 100%
+                percentageRisk = 100;
+                MainActivity.percentageRisk.setText(percentageRisk + "%");
+            } else {
+                percentageRisk = result.size() * 10;
+                MainActivity.percentageRisk.setText(percentageRisk + "%");
+                //Set Risk; size * 10
+            }
+
+
         }
-        //SEND RESULT
+            //SEND RESULT
 
-        JSONObject content = null;
-        JSONObject body = null;
-        try {
-            content = new JSONObject();
-            body = new JSONObject();
-            ///S1 Y S2
-            content.put("idRequest", DemoUtils.getIdRequest());
-            body.put("riskPercentage", percentageRisk);
-            content.put("body", body);
+            JSONObject content = null;
+            JSONObject body = null;
+            try {
+                content = new JSONObject();
+                body = new JSONObject();
+                ///S1 Y S2
+                content.put("idRequest", DemoUtils.getIdRequest());
+                body.put("riskPercentage", percentageRisk);
+                content.put("body", body);
 
-            MqttClient client = new MqttClient();
-            Log.i("SENT RESULT: ", String.valueOf(content));
-            client.publishMessage(MQTTService.getClient(), String.valueOf(content), 1, "Covid19PERCOM");
+                MqttClient client = new MqttClient();
+                Log.i("SENT RESULT: ", String.valueOf(content));
+                client.publishMessage(MQTTService.getClient(), String.valueOf(content), 1, "Covid19PERCOM");
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
 
 
     }

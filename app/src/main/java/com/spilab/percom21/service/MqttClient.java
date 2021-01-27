@@ -91,7 +91,7 @@ public class MqttClient {
         encodedPayload = msg.getBytes("UTF-8");
         MqttMessage message = new MqttMessage(encodedPayload);
         message.setId(320);
-        message.setRetained(true);
+        message.setRetained(false);
         message.setQos(qos);
         client.publish(topic, message);
     }
