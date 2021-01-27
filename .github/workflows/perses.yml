@@ -85,40 +85,40 @@ jobs:
           run: |       
             cd .perses_runner
             node index -a launch -n ${{steps.generate-project-id.outputs.result}}
-#        - name: "Perses Test"
-#          run: |
-#            cd .perses_runner
-#            node index -a tests -n ${{steps.generate-project-id.outputs.result}}
-#
-#        - name: "Perses gets logs from virtual devices"
-#          run: |
-#            cd .perses_runner
-#            node index -a getLogs -n ${{steps.generate-project-id.outputs.result}}
-#
-#        - name: "Perses Destroy Infrastructure"
-#          run: |
-#            cd .perses_runner
-#            node index -a destroy -n ${{steps.generate-project-id.outputs.result}}
-#        # Check logs
-#        - name: "Check logs"
-#          run: |
-#            ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
-#            ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/devices-logs
-#
-#        # Gather Test Result
-#        - name: "Gather Performance Test Results"
-#          run: |
-#            cp -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/ .perses_gha/check/
-#            cd .perses_gha/check
-#            bash gatherResults.sh
-#
-#        # Check Perses Result
-#        - name: "Check Test Results"
-#          run: |
-#            cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .perses_gha/check/
-#            cd .perses_gha/check
-#            npm install
-#            npm start
+        - name: "Perses Test"
+          run: |
+            cd .perses_runner
+            node index -a tests -n ${{steps.generate-project-id.outputs.result}}
+
+        - name: "Perses gets logs from virtual devices"
+          run: |
+            cd .perses_runner
+            node index -a getLogs -n ${{steps.generate-project-id.outputs.result}}
+
+        - name: "Perses Destroy Infrastructure"
+          run: |
+            cd .perses_runner
+            node index -a destroy -n ${{steps.generate-project-id.outputs.result}}
+        # Check logs
+        - name: "Check logs"
+          run: |
+            ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/
+            ls -l .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/devices-logs
+
+        # Gather Test Result
+        - name: "Gather Performance Test Results"
+          run: |
+            cp -r .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/logs/ .perses_gha/check/
+            cd .perses_gha/check
+            bash gatherResults.sh
+
+        # Check Perses Result
+        - name: "Check Test Results"
+          run: |
+            cp .perses_runner/projects/${{steps.generate-project-id.outputs.result}}/perses-tests.yaml .perses_gha/check/
+            cd .perses_gha/check
+            npm install
+            npm start
 
 #        # Save Perses Result
 #        - name: Pushes test file
