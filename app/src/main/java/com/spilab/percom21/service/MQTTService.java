@@ -124,7 +124,6 @@ public class MQTTService extends Service {
                 intentDevice.putExtra("state", false);
                 intentDevice.setAction("STATE");
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentDevice);
-
             }
 
             @Override
@@ -161,8 +160,6 @@ public class MQTTService extends Service {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-
                 }
 
             }
@@ -189,13 +186,11 @@ public class MQTTService extends Service {
 
 
             if (result.size() >= 10) {
-                //Risk 100%
                 percentageRisk = 100;
                 MainActivity.percentageRisk.setText(percentageRisk + "%");
             } else {
                 percentageRisk = result.size() * 10;
                 MainActivity.percentageRisk.setText(percentageRisk + "%");
-                //Set Risk; size * 10
             }
 
 
