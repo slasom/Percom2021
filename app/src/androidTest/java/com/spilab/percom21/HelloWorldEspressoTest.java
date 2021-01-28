@@ -28,8 +28,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
     public class HelloWorldEspressoTest {
 
 
-
-
     @Rule public ActivityScenarioRule<MainActivity> activityScenarioRule
             = new ActivityScenarioRule<>(MainActivity.class);
 
