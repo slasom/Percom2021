@@ -28,15 +28,24 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
     public class HelloWorldEspressoTest {
 
 
+
+
     @Rule public ActivityScenarioRule<MainActivity> activityScenarioRule
             = new ActivityScenarioRule<>(MainActivity.class);
+
 
 
     @Test
     public void checkStateTextView() {
 
         onView(withId((R.id.buttonSendRequest))).perform(click());
-        onView(withId(R.id.textViewState)).check(ViewAssertions.matches(withText("Obtaining...")));
+        try {
+            Thread.sleep(500);
+            onView(withId(R.id.textViewState)).check(ViewAssertions.matches(withText("Obtaining...")));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
