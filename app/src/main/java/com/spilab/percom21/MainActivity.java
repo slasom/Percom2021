@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button buttonSendRequest;
     public static TextView percentageRisk;
+    public static TextView state;
     private static final String CARPETA_RAIZ = "HeatmapV3/";
     Intent mServiceIntent;
     private Gson gson;
@@ -80,14 +81,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         buttonSendRequest = (Button) findViewById(R.id.buttonSendRequest);
+        state = (TextView) findViewById(R.id.textViewState);
         percentageRisk = (TextView) findViewById(R.id.textPercentage);
         client = new MqttClient();
         gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
         buttonSendRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buttonSendRequest.setTextColor(Color.RED);
+
+                state.setText("Obtaining...");
+
                 //SEND REQUEST
+
 
                 JSONObject content = null;
                 JSONObject params = null;

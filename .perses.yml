@@ -61,12 +61,8 @@ time_wait: "8m"
 ######### Tests Definition #########
 
 tests:
-#  - id: "GUI Performance"
-#    type: "espresso"
-#    expect:
-#      time_execution:
-#        under: 200
-
+  - id: "GUI Performance"
+    type: "espresso"
   - id: "Observed Performance1"
     type: "apipecker"
     config:
@@ -87,13 +83,3 @@ tests:
     expect:
       mean:
         under: 2000
-#  - id: "Observed Performance2"
-#    type: "apipecker"
-#    config:
-#      concurrentUsers: 3
-#      iterations: 5
-#      delay: 500
-#      url: "http://108.129.48.139/mqtt/mc/heatmaps?beginDate=2019-06-10T08:00:28Z&endDate=2019-06-10T20:56:28Z&latitude=37.378833&longitude=-5.970739&radius=600&devices=3&timeout=2500"
-#    expect:
-#      mean:
-#        under: 6000

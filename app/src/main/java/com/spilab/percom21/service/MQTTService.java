@@ -188,15 +188,17 @@ public class MQTTService extends Service {
             if (result.size() >= 10) {
                 percentageRisk = 100;
                 MainActivity.percentageRisk.setText(percentageRisk + "%");
+                MainActivity.state.setText("Complete");
             } else {
                 percentageRisk = result.size() * 10;
                 MainActivity.percentageRisk.setText(percentageRisk + "%");
+                MainActivity.state.setText("Complete");
             }
 
 
         }
             //SEND RESULT
-
+            MainActivity.state.setText("Complete");
             JSONObject content = null;
             JSONObject body = null;
             try {
