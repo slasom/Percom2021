@@ -32,8 +32,8 @@ jobs:
           uses: vgaidarji/android-github-actions-build@v1.0.1
           with:
             args: "./gradlew assembleAndroidTest assembleDebug"
-#        - run: ls -l ./app/build/outputs/apk/debug/app-debug.apk
-#        - run: ls -l ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+        - run: ls -l ./app/build/outputs/apk/debug/app-debug.apk
+        - run: ls -l ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
         # Build Perses config
         - name: Use Node.js 14.x
@@ -95,10 +95,7 @@ jobs:
             cd .perses_runner
             node index -a getLogs -n ${{steps.generate-project-id.outputs.result}}
 
-        - name: "Perses Destroy Infrastructure"
-          run: |
-            cd .perses_runner
-            node index -a destroy -n ${{steps.generate-project-id.outputs.result}}
+
         # Check logs
         - name: "Check logs"
           run: |
@@ -119,6 +116,13 @@ jobs:
             cd .perses_gha/check
             npm install
             npm start
+
+        - name: "Perses Destroy Infrastructure"
+          run: |
+            cd .perses_runner
+            node index -a destroy -n ${{steps.generate-project-id.outputs.result}}
+
+
 
 #        # Save Perses Result
 #        - name: Pushes test file
