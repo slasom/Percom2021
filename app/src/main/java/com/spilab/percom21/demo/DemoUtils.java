@@ -29,8 +29,6 @@ public class DemoUtils {
 
     static {
         try {
-//            beginDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse("2020-01-24 03:00:28");
-//            endDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse("2020-01-26 23:32:28");
 
             beginDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse("2020-01-24 03:00:28");
             endDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse("2020-01-26 23:32:28");
