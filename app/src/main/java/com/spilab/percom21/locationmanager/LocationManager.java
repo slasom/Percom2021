@@ -71,7 +71,6 @@ public class LocationManager {
     }
 
     public static List<LocationBeanRealm> getLocationHistory(Date begin, Date end) {
-        //Log.i("HEATMAP-QUERY"," - Buscando localizaciones...");
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .modules(new LocationBeanRealmModule())
                 .name("Database.realm")
@@ -83,17 +82,16 @@ public class LocationManager {
                 .lessThan("timestamp", end)
                 .findAll();
 
-        //Log.i("HEATMAP-ENCONTRADAS="," - " + String.valueOf(locations.size()));
+
         List<LocationBeanRealm> locs = new ArrayList<LocationBeanRealm>();
         for (LocationBeanRealm l : locations) {
             locs.add(l);
-            //Log.i("HEATMAP-ENCONTRADA"," ->"+l.toString());
+
         }
         return locs;
     }
 
     public static List<LocationBeanRealm> getAllLocations() {
-        //Log.i("HEATMAP-QUERY"," - Buscando localizaciones...");
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .modules(new LocationBeanRealmModule())
                 .name("Database.realm")
@@ -148,11 +146,6 @@ public class LocationManager {
 
     public static List<LocationFrequency> filterLocationV2(List<LocationFrequency> locations, double xmin, double xmax, double ymin, double ymax) {
         List<LocationFrequency> results = new ArrayList<LocationFrequency>();
-//        PointF origin = new PointF((float)latitude, (float)longitude);
-//        PointF north = calculateDerivedPosition(origin, radius, 0);
-//        PointF east = calculateDerivedPosition(origin, radius, 90);
-//        PointF south = calculateDerivedPosition(origin, radius, 180);
-//        PointF west = calculateDerivedPosition(origin, radius, 270);
         long startTime = System.currentTimeMillis();
 
         for (LocationFrequency location : locations) {
@@ -163,10 +156,7 @@ public class LocationManager {
                 results.add(location);
             }
 
-//            if(location.getLatitude()>south.x && location.getLatitude()<north.x
-//                    && location.getLongitude()>west.y && location.getLongitude()<east.y){
-//                results.add(location);
-//            }
+
         }
 
         long difference = System.currentTimeMillis() - startTime;
@@ -299,49 +289,4 @@ public class LocationManager {
         return null;
     }
 
-    public static void storeLocations(List<LocationFrequency> locationList) {
-        RealmConfiguration config = new RealmConfiguration.Builder()
-                .modules(new LocationFrequencyModule())
-                .name("heatmap.realm")
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm realm = Realm.getInstance(config);
-        if (!LocationManager.mapFinishedFlag) {
-            realm.beginTransaction();
-            for (LocationFrequency location : locationList) {
-                realm.copyToRealm(location);
-            }
-            realm.commitTransaction();
-        }
-        realm.close();
-    }
-
-    public static List<LocationFrequency> getLocations() {
-        LocationManager.mapFinishedFlag = true;
-
-        RealmConfiguration config = new RealmConfiguration.Builder()
-                .modules(new LocationFrequencyModule())
-                .name("heatmap.realm")
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm realm = Realm.getInstance(config);
-        realm.beginTransaction();
-        List<LocationFrequency> result = realm.where(LocationFrequency.class).findAll();
-        result = aggreateLocations(result);
-        realm.commitTransaction();
-        return result;
-    }
-
-    public static void clearLocations() {
-        RealmConfiguration config = new RealmConfiguration.Builder()
-                .modules(new LocationFrequencyModule())
-                .name("heatmap.realm")
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm realm = Realm.getInstance(config);
-        realm.beginTransaction();
-        realm.where(LocationFrequency.class).findAll().deleteAllFromRealm();
-        realm.commitTransaction();
-        realm.close();
-    }
 }

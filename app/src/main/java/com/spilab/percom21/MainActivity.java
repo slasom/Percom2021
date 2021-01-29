@@ -135,10 +135,7 @@ public class MainActivity extends AppCompatActivity {
         // check location permission
         if (storagePermissionsGranted && mLocationPermissionsGranted) {
             startServiceMQTT();
-
             Log.e("Start", " START SERVICE");
-        } else {
-            Log.e("Permisos:", "No tiene todos los permisos activos");
         }
 
     }
@@ -159,8 +156,6 @@ public class MainActivity extends AppCompatActivity {
         String result;
         if (simulationName == null) {
 
-            Log.e("Error: ", "No se ha introducido ningún nombre para la simulacion");
-
             //result = loadJSONFromAsset("locs.json");
             result = loadJSONFromAsset("S2_User0.json");
 
@@ -179,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
         localizaciones = gson.fromJson(result, new TypeToken<List<LocationBeanRealm>>() {
         }.getType());
 
-        Log.e("LISTA LOCALIZACIONES: ", String.valueOf(localizaciones.size()));
         guardarLocsStaticas(localizaciones);
     }
 

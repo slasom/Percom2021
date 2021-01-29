@@ -141,7 +141,6 @@ public class MQTTService extends Service {
                         Type listType = new TypeToken<List<LocationFrequency>>() {
                         }.getType();
                         List<LocationFrequency> list = gson.fromJson(String.valueOf(json), listType);
-                        Log.i("SIZE LIST RECEIVED", String.valueOf(list.size()));
 
                         calculateRisk(list);
 
@@ -161,7 +160,6 @@ public class MQTTService extends Service {
                         e.printStackTrace();
                     }
                 }
-
             }
 
             @Override
@@ -177,13 +175,7 @@ public class MQTTService extends Service {
         if (heatmapPositiveCovid.size() > 0) {
 
             List<LocationFrequency> locations = LocationManager.getLocationHistoryByDate(DemoUtils.beginDate, DemoUtils.endDate);
-
-            Log.i("LISTA LOCAL: ", locations.toString());
-            Log.i("LISTA RECIBIDA: ", heatmapPositiveCovid.toString());
-
             List<LocationFrequency> result = LocationManager.matchesHeatmaps(locations, heatmapPositiveCovid);
-            Log.i("LISTA FINALLLL: ", result.toString());
-
 
             if (result.size() >= 10) {
                 percentageRisk = 100;
@@ -292,7 +284,7 @@ public class MQTTService extends Service {
 
     private void startMyOwnForeground() {
 
-        String NOTIFICATION_CHANNEL_ID = "org.openapitools.server";
+        String NOTIFICATION_CHANNEL_ID = "com.spilab.percom21";
         String channelName = "Background Service";
         NotificationChannel chan = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
