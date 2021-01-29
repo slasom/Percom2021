@@ -32,8 +32,8 @@ jobs:
           uses: vgaidarji/android-github-actions-build@v1.0.1
           with:
             args: "./gradlew assembleAndroidTest assembleDebug"
-        - run: ls -l ./app/build/outputs/apk/debug/app-debug.apk
-        - run: ls -l ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+#        - run: ls -l ./app/build/outputs/apk/debug/app-debug.apk
+#        - run: ls -l ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
         # Build Perses config
         - name: Use Node.js 14.x
