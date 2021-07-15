@@ -59,7 +59,7 @@ jobs:
         - name: Get Perses Runner
           uses: actions/checkout@v2
           with:
-            repository: perses-org/perses
+            repository: perses-org/perses-engine
             path: .perses_runner
 
         - name: "Install dependences"
